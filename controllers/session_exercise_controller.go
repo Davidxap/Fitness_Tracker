@@ -16,7 +16,7 @@ import (
 func GetSessionExercises(w http.ResponseWriter, r *http.Request) {
 	rows, err := database.DB.Query(
 		`SELECT id, session_id, exercise_id, sets, reps, weight, created_at
-         FROM session_exercises`,
+    FROM session_exercises`,
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -53,7 +53,7 @@ func GetSessionExerciseByID(w http.ResponseWriter, r *http.Request) {
 	var se models.SessionExercise
 	err = database.DB.QueryRow(
 		`SELECT id, session_id, exercise_id, sets, reps, weight, created_at
-         FROM session_exercises WHERE id=$1`, id,
+        FROM session_exercises WHERE id=$1`, id,
 	).Scan(
 		&se.ID, &se.SessionID, &se.ExerciseID,
 		&se.Sets, &se.Reps, &se.Weight, &se.CreatedAt,
@@ -111,8 +111,8 @@ func UpdateSessionExercise(w http.ResponseWriter, r *http.Request) {
 
 	res, err := database.DB.Exec(
 		`UPDATE session_exercises
-         SET session_id=$1, exercise_id=$2, sets=$3, reps=$4, weight=$5
-         WHERE id=$6`,
+        SET session_id=$1, exercise_id=$2, sets=$3, reps=$4, weight=$5
+        WHERE id=$6`,
 		se.SessionID, se.ExerciseID, se.Sets, se.Reps, se.Weight, id,
 	)
 	if err != nil {
