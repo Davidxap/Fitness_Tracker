@@ -1,8 +1,10 @@
 package routes
 
 import (
-	"fitness-tracker/backend/controllers"
 	"net/http"
+
+	"fitness-tracker/backend/controllers"
+	"fitness-tracker/backend/middleware"
 
 	"github.com/gorilla/mux"
 )
@@ -10,38 +12,45 @@ import (
 func RegisterRoutes() *mux.Router {
 	r := mux.NewRouter()
 
-	// Ruta raíz de prueba
+	// Health-check público
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Fitness‑Tracker API 🚀"))
 	}).Methods("GET")
 
-	// Usuarios
-	r.HandleFunc("/api/users", controllers.GetUsers).Methods("GET")
-	r.HandleFunc("/api/users", controllers.CreateUser).Methods("POST")
-	r.HandleFunc("/api/users/{id}", controllers.GetUserByID).Methods("GET")
-	r.HandleFunc("/api/users/{id}", controllers.UpdateUser).Methods("PUT")
-	r.HandleFunc("/api/users/{id}", controllers.DeleteUser).Methods("DELETE")
+	// ----- Autenticación público -----
+	r.HandleFunc("/api/login", controllers.LoginHandler).Methods("POST")
+	r.HandleFunc("/api/users", controllers.CreateUser).Methods("POST") // registro
 
-	// Sesiones de entrenamiento
-	r.HandleFunc("/api/sessions", controllers.GetWorkoutSessions).Methods("GET")
-	r.HandleFunc("/api/sessions", controllers.CreateWorkoutSession).Methods("POST")
-	r.HandleFunc("/api/sessions/{id}", controllers.GetWorkoutSessionByID).Methods("GET")
-	r.HandleFunc("/api/sessions/{id}", controllers.UpdateWorkoutSession).Methods("PUT")
-	r.HandleFunc("/api/sessions/{id}", controllers.DeleteWorkoutSession).Methods("DELETE")
+	// ----- Rutas protegidas: requiere JWT -----
+	auth := r.NewRoute().Subrouter()
+	auth.Use(middleware.JWTAuth)
+
+	// Usuarios (excepto Create)
+	auth.HandleFunc("/api/users", controllers.GetUsers).Methods("GET")
+	auth.HandleFunc("/api/users/{id}", controllers.GetUserByID).Methods("GET")
+	auth.HandleFunc("/api/users/{id}", controllers.UpdateUser).Methods("PUT")
+	auth.HandleFunc("/api/users/{id}", controllers.DeleteUser).Methods("DELETE")
+
+	// Sesiones
+	auth.HandleFunc("/api/sessions", controllers.GetWorkoutSessions).Methods("GET")
+	auth.HandleFunc("/api/sessions", controllers.CreateWorkoutSession).Methods("POST")
+	auth.HandleFunc("/api/sessions/{id}", controllers.GetWorkoutSessionByID).Methods("GET")
+	auth.HandleFunc("/api/sessions/{id}", controllers.UpdateWorkoutSession).Methods("PUT")
+	auth.HandleFunc("/api/sessions/{id}", controllers.DeleteWorkoutSession).Methods("DELETE")
 
 	// Ejercicios
-	r.HandleFunc("/api/exercises", controllers.GetExercises).Methods("GET")
-	r.HandleFunc("/api/exercises", controllers.CreateExercise).Methods("POST")
-	r.HandleFunc("/api/exercises/{id}", controllers.GetExerciseByID).Methods("GET")
-	r.HandleFunc("/api/exercises/{id}", controllers.UpdateExercise).Methods("PUT")
-	r.HandleFunc("/api/exercises/{id}", controllers.DeleteExercise).Methods("DELETE")
+	auth.HandleFunc("/api/exercises", controllers.GetExercises).Methods("GET")
+	auth.HandleFunc("/api/exercises", controllers.CreateExercise).Methods("POST")
+	auth.HandleFunc("/api/exercises/{id}", controllers.GetExerciseByID).Methods("GET")
+	auth.HandleFunc("/api/exercises/{id}", controllers.UpdateExercise).Methods("PUT")
+	auth.HandleFunc("/api/exercises/{id}", controllers.DeleteExercise).Methods("DELETE")
 
-	// Detalles de sesión-ejercicio
-	r.HandleFunc("/api/session-exercises", controllers.GetSessionExercises).Methods("GET")
-	r.HandleFunc("/api/session-exercises", controllers.CreateSessionExercise).Methods("POST")
-	r.HandleFunc("/api/session-exercises/{id}", controllers.GetSessionExerciseByID).Methods("GET")
-	r.HandleFunc("/api/session-exercises/{id}", controllers.UpdateSessionExercise).Methods("PUT")
-	r.HandleFunc("/api/session-exercises/{id}", controllers.DeleteSessionExercise).Methods("DELETE")
+	// Session-exercises
+	auth.HandleFunc("/api/session-exercises", controllers.GetSessionExercises).Methods("GET")
+	auth.HandleFunc("/api/session-exercises", controllers.CreateSessionExercise).Methods("POST")
+	auth.HandleFunc("/api/session-exercises/{id}", controllers.GetSessionExerciseByID).Methods("GET")
+	auth.HandleFunc("/api/session-exercises/{id}", controllers.UpdateSessionExercise).Methods("PUT")
+	auth.HandleFunc("/api/session-exercises/{id}", controllers.DeleteSessionExercise).Methods("DELETE")
 
 	return r
 }
