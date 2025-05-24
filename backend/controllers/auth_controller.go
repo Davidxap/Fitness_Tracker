@@ -15,38 +15,53 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-// LoginHandler valida credenciales y emite JWT
+// LoginResponse envía token + datos de usuario
+type LoginResponse struct {
+	Token string      `json:"token"`
+	User  models.User `json:"user"`
+}
+
+// LoginHandler valida credenciales y emite JWT + User
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
 	// Buscamos usuario por email
 	var u models.User
 	err := database.DB.QueryRow(
-		"SELECT id, password FROM users WHERE email=$1", req.Email,
-	).Scan(&u.ID, &u.Password)
+		"SELECT id, name, email, password FROM users WHERE email=$1",
+		req.Email,
+	).Scan(&u.ID, &u.Name, &u.Email, &u.Password)
 	if err != nil {
-		http.Error(w, "Credenciales inválidas", http.StatusUnauthorized)
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
-	// Comparamos password (texto plano)
+	// Comparamos password (plano)
 	if req.Password != u.Password {
-		http.Error(w, "Credenciales inválidas", http.StatusUnauthorized)
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	// Generamos JWT
 	token, err := utils.GenerateToken(u.ID)
 	if err != nil {
-		http.Error(w, "Error generando token", http.StatusInternalServerError)
+		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
 
-	// Devolvemos el token en JSON
+	// No devolvemos la contraseña
+	u.Password = ""
+
+	// Armamos respuesta
+	resp := LoginResponse{
+		Token: token,
+		User:  u,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": token})
+	json.NewEncoder(w).Encode(resp)
 }

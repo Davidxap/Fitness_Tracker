@@ -35,3 +35,51 @@ CREATE TABLE IF NOT EXISTS session_exercises (
     weight FLOAT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- Insterto un listado de ejercicios tipicos
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Squat', 'Basic squat exercise', 'Legs'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Squat');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Bench Press', 'Barbell bench press', 'Chest'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Bench Press');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Deadlift', 'Barbell deadlift', 'Back'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Deadlift');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Pull-Up', 'Bodyweight pull-up', 'Back'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Pull-Up');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Push-Up', 'Bodyweight push-up', 'Chest'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Push-Up');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Overhead Press', 'Standing barbell press', 'Shoulders'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Overhead Press');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Barbell Row', 'Bent-over barbell row', 'Back'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Barbell Row');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Lunges', 'Walking lunges', 'Legs'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Lunges');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Bicep Curl', 'Dumbbell bicep curl', 'Arms'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Bicep Curl');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Tricep Dip', 'Bodyweight tricep dip', 'Arms'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Tricep Dip');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Plank', 'Core stabilization exercise', 'Core'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Plank');
+
+INSERT INTO exercises (name, description, muscle_group)
+SELECT 'Jumping Jack', 'Cardio warm-up', 'Full Body'
+WHERE NOT EXISTS (SELECT 1 FROM exercises WHERE name='Jumping Jack');
