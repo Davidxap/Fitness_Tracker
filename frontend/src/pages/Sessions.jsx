@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import api from '../api/api'
 import useAuth from '../hooks/useAuth'
-import SessionList from '../components/Sessions/SessionList'
 import SessionForm from '../components/Sessions/SessionForm'
+import SessionList from '../components/Sessions/SessionList'
 
 export default function Sessions() {
   const { user } = useAuth()
@@ -11,26 +11,49 @@ export default function Sessions() {
   const [showForm, setShowForm] = useState(false)
   const [message, setMessage] = useState('')
 
-  const loadSessions = async () => {
+  // Carga ejercicios + sesiones + relaciones
+  const loadData = async () => {
     try {
+      // 1) Obtener todos los ejercicios y construir exMap
+      const exRes = await api.get('/exercises')
+      const exMap = {}
+      exRes.data.forEach(e => {
+        exMap[e.id] = e.name
+      })
+
+      // 2) Obtener sesiones y session-exercises
       const [sRes, seRes] = await Promise.all([
         api.get('/sessions'),
         api.get('/session-exercises')
       ])
-      // Filtramos por user.id
+
+      // 3) Filtrar solo las sesiones del user
       const own = sRes.data.filter(s => s.user_id === user.id)
-      const combined = own.map(s => ({
-        ...s,
-        exercises: seRes.data.filter(se => se.session_id === s.id)
-      }))
+
+      // 4) Combinar cada sesión con sus ejercicios y asignar exercise_name
+      const combined = own.map(s => {
+        // obtenemos solo los relationships de esta sesión
+        const related = seRes.data.filter(se => se.session_id === s.id)
+        // mapeamos cada uno añadiendo exercise_name
+        const exercises = related.map(se => ({
+          id: se.id,
+          exercise_id: se.exercise_id,
+          exercise_name: exMap[se.exercise_id] || 'Unknown',
+          sets: se.sets,
+          reps: se.reps,
+          weight: se.weight
+        }))
+        return { ...s, exercises }
+      })
+
       setSessions(combined)
     } catch (err) {
-      console.error(err)
+      console.error('Error loading sessions:', err)
     }
   }
 
   useEffect(() => {
-    if (user) loadSessions()
+    if (user) loadData()
   }, [user])
 
   const handleCreate = () => {
@@ -42,21 +65,25 @@ export default function Sessions() {
     try {
       let sessionId
       if (editing) {
+        // Update existing
         await api.put(`/sessions/${editing.id}`, {
+          name: data.name,
           date: data.date,
           duration_minutes: data.duration_minutes,
           observations: data.observations,
           user_id: user.id
         })
         sessionId = editing.id
-        // Borramos previos
+        // Borrar anteriores session-exercises
         await Promise.all(
           editing.exercises.map(e =>
             api.delete(`/session-exercises/${e.id}`)
           )
         )
       } else {
+        // Create new
         const r = await api.post('/sessions', {
+          name: data.name,
           date: data.date,
           duration_minutes: data.duration_minutes,
           observations: data.observations,
@@ -64,7 +91,7 @@ export default function Sessions() {
         })
         sessionId = r.data.id
       }
-      // Creamos nuevos session-exercises
+      // Guardar los nuevos session-exercises
       await Promise.all(
         data.exercises.map(ent =>
           api.post('/session-exercises', {
@@ -80,24 +107,25 @@ export default function Sessions() {
       setTimeout(() => setMessage(''), 3000)
       setShowForm(false)
       setEditing(null)
-      loadSessions()
+      await loadData()
     } catch (err) {
-      console.error(err)
+      console.error('Error saving session:', err)
     }
   }
 
-  const handleEdit = session => {
-    setEditing(session)
+  const handleEdit = s => {
+    setEditing(s)
     setShowForm(true)
   }
 
   const handleDelete = async id => {
     if (!window.confirm('Delete this session?')) return
     try {
+      // borrar session-exercises luego la sesión
       const toDel = sessions.find(s => s.id === id).exercises
       await Promise.all(toDel.map(e => api.delete(`/session-exercises/${e.id}`)))
       await api.delete(`/sessions/${id}`)
-      loadSessions()
+      await loadData()
     } catch (err) {
       console.error(err)
     }
@@ -108,10 +136,10 @@ export default function Sessions() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">Your Sessions</h1>
+        <h1 className="text-3xl font-bold">Sessions</h1>
         <button
           onClick={handleCreate}
-          className="bg-green-600 text-white px-4 py-2 rounded transition transform active:scale-95"
+          className="bg-green-600 text-white px-4 py-2 rounded transition active:scale-95"
         >
           + New Session
         </button>
@@ -137,6 +165,7 @@ export default function Sessions() {
 
       <SessionList
         sessions={sessions}
+        formatDate={d => d.slice(0, 10)}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />

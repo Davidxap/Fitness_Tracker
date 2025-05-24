@@ -12,7 +12,7 @@ export default function Navbar() {
           <>
             <Link className="mr-4" to="/sessions">Sessions</Link>
             <Link className="mr-4" to="/exercises">Exercises</Link>
-            <Link to="/session-exercises">Details</Link>
+            
           </>
         )}
       </div>

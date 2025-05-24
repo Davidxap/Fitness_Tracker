@@ -5,6 +5,7 @@ import api from '../../api/api'
 
 export default function SessionForm({ initialData, onSave, onCancel }) {
   const [form, setForm] = useState({
+    name: '',
     date: '',
     duration_minutes: '',
     observations: ''
@@ -13,13 +14,13 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
   const [options, setOptions] = useState([])
   const [errors, setErrors] = useState({})
 
-  // Carga ejercicios BD y precarga form/entries si editing
   useEffect(() => {
     api.get('/exercises').then(res => {
       setOptions(res.data.map(e => ({ id: e.id, name: e.name })))
     })
     if (initialData) {
       setForm({
+        name: initialData.name,
         date: initialData.date,
         duration_minutes: initialData.duration_minutes,
         observations: initialData.observations || ''
@@ -33,14 +34,15 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
         }))
       )
     } else {
-      setForm({ date: '', duration_minutes: '', observations: '' })
+      setForm({ name: '', date: '', duration_minutes: '', observations: '' })
       setEntries([])
     }
   }, [initialData])
 
   const validate = () => {
     const e = {}
-    if (!form.date) e.date = 'Date is required'
+    if (!form.name) e.name = 'Session name required'
+    if (!form.date) e.date = 'Date required'
     if (!form.duration_minutes || form.duration_minutes <= 0)
       e.duration_minutes = 'Valid duration required'
     if (entries.length === 0) e.entries = 'Add at least one exercise'
@@ -48,10 +50,11 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = e => {
-    e.preventDefault()
+  const handleSubmit = ev => {
+    ev.preventDefault()
     if (!validate()) return
     onSave({
+      name: form.name,
       date: form.date,
       duration_minutes: Number(form.duration_minutes),
       observations: form.observations.trim(),
@@ -69,9 +72,8 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
     setForm(f => ({ ...f, [name]: value }))
   }
 
-  const addEntry = () => {
+  const addEntry = () =>
     setEntries(es => [...es, { exercise_id: '', sets: '', reps: '', weight: '' }])
-  }
   const updateEntry = (idx, e) => {
     const { name, value } = e.target
     setEntries(es => {
@@ -80,9 +82,8 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
       return nxt
     })
   }
-  const removeEntry = idx => {
+  const removeEntry = idx =>
     setEntries(es => es.filter((_, i) => i !== idx))
-  }
 
   return (
     <div className="bg-white p-6 rounded shadow mb-6">
@@ -94,25 +95,33 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
       )}
       <form onSubmit={handleSubmit}>
         <FormInput
+          label="Session Name"
+          name="name"
+          type="text"
+          value={form.name}
+          onChange={handleChange}
+          error={errors.name}
+        />
+        <FormInput
           label="Date"
-          type="date"
           name="date"
+          type="date"
           value={form.date}
           onChange={handleChange}
           error={errors.date}
         />
         <FormInput
           label="Duration (minutes)"
-          type="number"
           name="duration_minutes"
+          type="number"
           value={form.duration_minutes}
           onChange={handleChange}
           error={errors.duration_minutes}
         />
         <FormInput
           label="Observations"
-          type="text"
           name="observations"
+          type="text"
           value={form.observations}
           onChange={handleChange}
         />
@@ -131,7 +140,7 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
           <button
             type="button"
             onClick={addEntry}
-            className="mb-4 bg-indigo-600 text-white px-3 py-1 rounded transition transform active:scale-95"
+            className="mb-4 bg-indigo-600 text-white px-3 py-1 rounded transition active:scale-95"
           >
             + Add Exercise
           </button>
@@ -140,14 +149,14 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
         <div className="flex space-x-3 mt-4">
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded transition transform active:scale-95"
+            className="bg-blue-600 text-white px-4 py-2 rounded transition active:scale-95"
           >
             Save Session
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="bg-gray-400 text-white px-4 py-2 rounded transition transform active:scale-95"
+            className="bg-gray-400 text-white px-4 py-2 rounded transition active:scale-95"
           >
             Cancel
           </button>

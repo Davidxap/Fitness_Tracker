@@ -7,21 +7,29 @@ export const AuthContext = createContext()
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  // Al montar, cargamos de localStorage
   useEffect(() => {
     const t = localStorage.getItem('token')
     const u = localStorage.getItem('user')
     if (t && u) {
-      setToken(t)
-      setUser(JSON.parse(u))
+      // Validate user still exists
+      const parsed = JSON.parse(u)
+      api.get(`/users/${parsed.id}`)
+        .then(res => setUser(res.data))
+        .catch(() => localStorage.clear())
+        .finally(() => {
+          setToken(t)
+          setLoading(false)
+        })
+    } else {
+      localStorage.clear()
+      setLoading(false)
     }
   }, [])
 
-  // Login: pide /api/login
   const login = async (email, password) => {
     const res = await api.post('/login', { email, password })
-    // Guardamos token y user
     const { token: t, user: u } = res.data
     localStorage.setItem('token', t)
     localStorage.setItem('user', JSON.stringify(u))
@@ -30,18 +38,19 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    localStorage.clear()
     setToken(null)
     setUser(null)
   }
 
-  const register = async (name, email, password) => {
-    await api.post('/users', { name, email, password })
+  const register = async (name, email, password, age, weight) => {
+    await api.post('/users', { name, email, password, age, weight })
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, register }}>
+    <AuthContext.Provider
+      value={{ user, token, loading, login, logout, register }}
+    >
       {children}
     </AuthContext.Provider>
   )

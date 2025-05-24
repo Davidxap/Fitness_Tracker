@@ -9,19 +9,19 @@ import (
 	"fitness-tracker/backend/utils"
 )
 
-// LoginRequest estructura para recibir email+password
+// LoginRequest recibe email + password
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-// LoginResponse envía token + datos de usuario
+// LoginResponse retorna token + user data
 type LoginResponse struct {
 	Token string      `json:"token"`
 	User  models.User `json:"user"`
 }
 
-// LoginHandler valida credenciales y emite JWT + User
+// LoginHandler valida credenciales y emite JWT + datos del usuario
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -29,34 +29,41 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Buscamos usuario por email
+	// Seleccionamos todos los campos necesarios
 	var u models.User
 	err := database.DB.QueryRow(
-		"SELECT id, name, email, password FROM users WHERE email=$1",
+		`SELECT id, name, email, password, age, weight, created_at
+         FROM users WHERE email=$1`,
 		req.Email,
-	).Scan(&u.ID, &u.Name, &u.Email, &u.Password)
+	).Scan(
+		&u.ID,
+		&u.Name,
+		&u.Email,
+		&u.Password,
+		&u.Age,
+		&u.Weight,
+		&u.CreatedAt,
+	)
 	if err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
-	// Comparamos password (plano)
+	// Comparamos password en claro
 	if req.Password != u.Password {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
-	// Generamos JWT
+	// Generamos el token
 	token, err := utils.GenerateToken(u.ID)
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
 
-	// No devolvemos la contraseña
-	u.Password = ""
+	u.Password = "" // no enviamos password en la respuesta
 
-	// Armamos respuesta
 	resp := LoginResponse{
 		Token: token,
 		User:  u,

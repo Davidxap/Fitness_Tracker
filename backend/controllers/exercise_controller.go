@@ -44,7 +44,7 @@ func GetExerciseByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
@@ -55,7 +55,7 @@ func GetExerciseByID(w http.ResponseWriter, r *http.Request) {
 	).Scan(&e.ID, &e.Name, &e.Description, &e.MuscleGroup, &e.CreatedAt)
 
 	if err == sql.ErrNoRows {
-		http.Error(w, "Ejercicio no encontrado", http.StatusNotFound)
+		http.Error(w, "Exercise not found", http.StatusNotFound)
 		return
 	}
 	if err != nil {
@@ -71,7 +71,7 @@ func GetExerciseByID(w http.ResponseWriter, r *http.Request) {
 func CreateExercise(w http.ResponseWriter, r *http.Request) {
 	var e models.Exercise
 	if err := json.NewDecoder(r.Body).Decode(&e); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -94,13 +94,13 @@ func UpdateExercise(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
 	var e models.Exercise
 	if err := json.NewDecoder(r.Body).Decode(&e); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -113,7 +113,7 @@ func UpdateExercise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if cnt, _ := res.RowsAffected(); cnt == 0 {
-		http.Error(w, "Ejercicio no encontrado", http.StatusNotFound)
+		http.Error(w, "Exercise not found", http.StatusNotFound)
 		return
 	}
 
@@ -125,7 +125,7 @@ func DeleteExercise(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
@@ -135,7 +135,7 @@ func DeleteExercise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if cnt, _ := res.RowsAffected(); cnt == 0 {
-		http.Error(w, "Ejercicio no encontrado", http.StatusNotFound)
+		http.Error(w, "Exercise not found", http.StatusNotFound)
 		return
 	}
 

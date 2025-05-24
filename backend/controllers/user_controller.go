@@ -12,11 +12,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetUsers responde con la lista de todos los usuarios.
+// GetUsers lista todos los usuarios (omitimos password)
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	// Ejecutamos la consulta
 	rows, err := database.DB.Query(
-		"SELECT id, name, email, password, created_at FROM users",
+		"SELECT id, name, email, age, weight, created_at FROM users",
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -25,42 +24,35 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	var users []models.User
-	// Iteramos cada fila y la "scaneamos" en un User
 	for rows.Next() {
 		var u models.User
-		if err := rows.Scan(
-			&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt,
-		); err != nil {
+		if err := rows.Scan(&u.ID, &u.Name, &u.Email, &u.Age, &u.Weight, &u.CreatedAt); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		users = append(users, u)
 	}
 
-	// Cabecera JSON + envío
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
 
-// GetUserByID devuelve un único usuario según su {id}.
+// GetUserByID obtiene datos de un usuario
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
-	// Extraemos el parámetro "id" de la URL
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
 	var u models.User
-	// Consulta parametrizada para evitar inyección SQL
 	err = database.DB.QueryRow(
-		"SELECT id, name, email, password, created_at FROM users WHERE id=$1",
+		"SELECT id, name, email, age, weight, created_at FROM users WHERE id=$1",
 		id,
-	).Scan(&u.ID, &u.Name, &u.Email, &u.Password, &u.CreatedAt)
-
+	).Scan(&u.ID, &u.Name, &u.Email, &u.Age, &u.Weight, &u.CreatedAt)
 	if err == sql.ErrNoRows {
-		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
+		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 	if err != nil {
@@ -72,72 +64,69 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(u)
 }
 
-// CreateUser crea un nuevo usuario leyendo el cuerpo JSON.
+// CreateUser crea un usuario con age y weight
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var u models.User
-	// Decodificamos JSON a struct
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	// Insert y devolver id + timestamp
 	err := database.DB.QueryRow(
-		"INSERT INTO users(name,email,password) VALUES($1,$2,$3) RETURNING id,created_at",
-		u.Name, u.Email, u.Password,
+		`INSERT INTO users(name,email,password,age,weight)
+         VALUES($1,$2,$3,$4,$5) RETURNING id,created_at`,
+		u.Name, u.Email, u.Password, u.Age, u.Weight,
 	).Scan(&u.ID, &u.CreatedAt)
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	u.Password = ""
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(u)
 }
 
-// UpdateUser modifica campos de un usuario existente.
+// UpdateUser actualiza name,email,password,age,weight
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
 	var u models.User
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	// Ejecutamos UPDATE
 	res, err := database.DB.Exec(
-		"UPDATE users SET name=$1, email=$2, password=$3 WHERE id=$4",
-		u.Name, u.Email, u.Password, id,
+		`UPDATE users
+         SET name=$1, email=$2, password=$3, age=$4, weight=$5
+         WHERE id=$6`,
+		u.Name, u.Email, u.Password, u.Age, u.Weight, id,
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Verificar que algo cambió
-	count, _ := res.RowsAffected()
-	if count == 0 {
-		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
+	if cnt, _ := res.RowsAffected(); cnt == 0 {
+		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent) // 204 sin cuerpo
+	w.WriteHeader(http.StatusNoContent)
 }
 
-// DeleteUser elimina un usuario por su {id}.
+// DeleteUser elimina usuario
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
@@ -146,10 +135,8 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	count, _ := res.RowsAffected()
-	if count == 0 {
-		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
+	if cnt, _ := res.RowsAffected(); cnt == 0 {
+		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 

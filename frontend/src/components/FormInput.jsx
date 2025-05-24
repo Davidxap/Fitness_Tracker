@@ -1,17 +1,28 @@
-import React from 'react';
+import React from 'react'
 
-export default function FormInput({ label, type, value, onChange, name, error }) {
+/**
+ * Input con label y error display.
+ */
+export default function FormInput({
+  label,
+  type,
+  name,
+  value,
+  onChange,
+  error
+}) {
   return (
     <div className="mb-4">
-      <label className="block mb-1">{label}</label>
+      <label className="block mb-1 font-medium">{label}</label>
       <input
         className="w-full p-2 border rounded"
         type={type}
         name={name}
         value={value}
         onChange={onChange}
+        autoComplete="off"           // desactiva sugerencias
       />
       {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
     </div>
-  );
+  )
 }

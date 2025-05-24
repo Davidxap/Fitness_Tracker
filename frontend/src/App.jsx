@@ -12,20 +12,56 @@ import Sessions from './pages/Sessions'
 import Exercises from './pages/Exercises'
 
 export default function App() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return <p className="p-6">Loading app...</p>
+  }
 
   return (
     <div className="min-h-screen">
       <Navbar />
       <Routes>
-        <Route path="/login" element={<Login />} />
+        {/* Registro siempre accesible */}
         <Route path="/register" element={<Register />} />
 
-        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/sessions" element={<ProtectedRoute><Sessions /></ProtectedRoute>} />
-        <Route path="/exercises" element={<ProtectedRoute><Exercises /></ProtectedRoute>} />
+        {/* Login sólo si ya existe user */}
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/" replace /> : <Login />}
+        />
 
-        <Route path="*" element={<Navigate to={user ? '/' : '/login'} />} />
+        {/* Rutas protegidas */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sessions"
+          element={
+            <ProtectedRoute>
+              <Sessions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/exercises"
+          element={
+            <ProtectedRoute>
+              <Exercises />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Cualquier otra ruta */}
+        <Route
+          path="*"
+          element={<Navigate to={user ? '/' : '/register'} replace />}
+        />
       </Routes>
     </div>
   )

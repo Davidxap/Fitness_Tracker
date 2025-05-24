@@ -1,3 +1,4 @@
+// frontend/src/pages/Exercises.jsx
 import React, { useEffect, useState } from 'react'
 import api from '../api/api'
 
@@ -10,29 +11,23 @@ export default function Exercises() {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-4">Exercises Library</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded shadow">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 text-left">ID</th>
-              <th className="p-2 text-left">Name</th>
-              <th className="p-2 text-left">Muscle Group</th>
-              <th className="p-2 text-left">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map(ex => (
-              <tr key={ex.id} className="border-t">
-                <td className="p-2">{ex.id}</td>
-                <td className="p-2">{ex.name}</td>
-                <td className="p-2">{ex.muscle_group}</td>
-                <td className="p-2">{ex.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <h1 className="text-3xl font-bold mb-4">Exercises</h1>
+      <ul className="space-y-2">
+        {list.map(ex => (
+          <li
+            key={ex.id}
+            className="bg-white p-4 rounded shadow flex justify-between items-center"
+          >
+            <div>
+              <p><span className="font-semibold">Name:</span> {ex.name}</p>
+              <p><span className="font-semibold">Muscle Group:</span> {ex.muscle_group}</p>
+              {ex.description && (
+                <p><span className="font-semibold">Description:</span> {ex.description}</p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

@@ -46,7 +46,7 @@ func GetSessionExerciseByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
@@ -59,7 +59,7 @@ func GetSessionExerciseByID(w http.ResponseWriter, r *http.Request) {
 		&se.Sets, &se.Reps, &se.Weight, &se.CreatedAt,
 	)
 	if err == sql.ErrNoRows {
-		http.Error(w, "Registro no encontrado", http.StatusNotFound)
+		http.Error(w, "Record not found", http.StatusNotFound)
 		return
 	}
 	if err != nil {
@@ -75,7 +75,7 @@ func GetSessionExerciseByID(w http.ResponseWriter, r *http.Request) {
 func CreateSessionExercise(w http.ResponseWriter, r *http.Request) {
 	var se models.SessionExercise
 	if err := json.NewDecoder(r.Body).Decode(&se); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -99,13 +99,13 @@ func UpdateSessionExercise(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
 	var se models.SessionExercise
 	if err := json.NewDecoder(r.Body).Decode(&se); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
@@ -120,7 +120,7 @@ func UpdateSessionExercise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if cnt, _ := res.RowsAffected(); cnt == 0 {
-		http.Error(w, "Registro no encontrado", http.StatusNotFound)
+		http.Error(w, "Record not found", http.StatusNotFound)
 		return
 	}
 
@@ -132,7 +132,7 @@ func DeleteSessionExercise(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
 	}
 
@@ -142,7 +142,7 @@ func DeleteSessionExercise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if cnt, _ := res.RowsAffected(); cnt == 0 {
-		http.Error(w, "Registro no encontrado", http.StatusNotFound)
+		http.Error(w, "Record not found", http.StatusNotFound)
 		return
 	}
 
