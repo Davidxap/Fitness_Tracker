@@ -48,5 +48,59 @@ First, clone this repository to your local machine:
 git clone [https://github.com/your-username/Fitness_Tracker.git](https://github.com/your-username/Fitness_Tracker.git)
 cd Fitness_Tracker
 
+```
+---
+
+# Fitness Tracker (Proyecto de Aprendizaje) 📈
+
+Este es un pequeño proyecto de aplicación web **Fullstack** diseñado para el seguimiento básico de rutinas de ejercicio. Fue desarrollado como un proyecto de aprendizaje para explorar la integración de tecnologías modernas y patrones comunes en el desarrollo web.
+
+---
+
+## 🚀 Tecnologías Utilizadas
+
+* **Frontend:**
+    * [**React.js**](https://react.dev/): Una librería de JavaScript para construir interfaces de usuario.
+* **Backend:**
+    * [**GoLang**](https://go.dev/): Un lenguaje de programación compilado y concurrente, ideal para APIs eficientes.
+* **Base de Datos:**
+    * [**PostgreSQL**](https://www.postgresql.org/): Un potente sistema de gestión de bases de datos relacionales de código abierto.
+
+---
+
+## ✅ Características Principales
+
+* **Autenticación de Usuarios (JWTs):** Permite a los usuarios registrarse e iniciar sesión de forma segura utilizando JSON Web Tokens.
+* **Operaciones CRUD:**
+    * **Crear:** Añadir nuevas rutinas o registros de ejercicio.
+    * **Leer:** Ver las rutinas existentes.
+    * **Actualizar:** Modificar los detalles de las rutinas.
+    * **Eliminar:** Borrar rutinas.
+* **Manejo de CORS:** Configuración para permitir la comunicación segura entre el frontend (React) y el backend (GoLang) desde diferentes orígenes.
+
+---
+
+## 🛠️ Configuración y Ejecución Local
+
+Para que este proyecto funcione en tu máquina local, sigue estos pasos:
+
+### 1. Prerrequisitos 📋
+
+Asegúrate de tener lo siguiente instalado:
+
+* [Node.js](https://nodejs.org/) (incluye npm/yarn)
+* [GoLang](https://go.dev/doc/install)
+* [PostgreSQL](https://www.postgresql.org/download/)
+* [Git](https://git-scm.com/downloads)
+
+### 2. Clonar el Repositorio ⬇️
+
+Primero, clona este repositorio en tu máquina local:
+
+```bash
+git clone [https://github.com/your-username/Fitness_Tracker.git](https://github.com/your-username/Fitness_Tracker.git)
+cd Fitness_Tracker
+
+
 
 
