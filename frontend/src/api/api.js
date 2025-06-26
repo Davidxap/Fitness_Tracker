@@ -5,7 +5,7 @@ const api = axios.create({
   baseURL: 'http://localhost:8080/api',
 })
 
-// Inyecta JWT si existe
+// Injects JWT if it exists
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
   if (token && config.headers) {

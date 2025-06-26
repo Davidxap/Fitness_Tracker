@@ -44,7 +44,7 @@ export default function ExerciseEntry({ options, data, onChange, onRemove }) {
         onChange={onChange}
       />
       <FormInput
-        label="Weight"
+        label="Weight(KG)"
         type="number"
         name="weight"
         value={data.weight}

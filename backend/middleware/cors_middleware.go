@@ -6,9 +6,9 @@ import (
 	"github.com/gorilla/handlers"
 )
 
-// CORSHandler envuelve tu router para permitir dominios
+// CORSHandler wraps your router to allow domains
 func CORSHandler(h http.Handler) http.Handler {
-	// Permitir todo (*) para pruebas; en producción restringe orígenes
+	// Allow all (*) for testing; restrict origins in production
 	return handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),

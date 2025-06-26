@@ -11,13 +11,16 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
     observations: ''
   })
   const [entries, setEntries] = useState([])
-  const [options, setOptions] = useState([])
+  const [options, setOptions] = useState([]) // State for exercise options (dropdown)
   const [errors, setErrors] = useState({})
 
   useEffect(() => {
+    // Fetch exercise options from the API when the component mounts
     api.get('/exercises').then(res => {
       setOptions(res.data.map(e => ({ id: e.id, name: e.name })))
     })
+
+    // Populate form and entries if initialData is provided (for editing)
     if (initialData) {
       setForm({
         name: initialData.name,
@@ -34,11 +37,13 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
         }))
       )
     } else {
+      // Reset form and entries if no initialData (for creating a new session)
       setForm({ name: '', date: '', duration_minutes: '', observations: '' })
       setEntries([])
     }
-  }, [initialData])
+  }, [initialData]) // Rerun effect if initialData changes
 
+  // Validate form fields
   const validate = () => {
     const e = {}
     if (!form.name) e.name = 'Session name required'
@@ -50,9 +55,10 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
     return Object.keys(e).length === 0
   }
 
+  // Handle form submission
   const handleSubmit = ev => {
     ev.preventDefault()
-    if (!validate()) return
+    if (!validate()) return // Stop if validation fails
     onSave({
       name: form.name,
       date: form.date,
@@ -67,13 +73,17 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
     })
   }
 
+  // Handle changes in main form fields
   const handleChange = e => {
     const { name, value } = e.target
     setForm(f => ({ ...f, [name]: value }))
   }
 
+  // Add a new exercise entry
   const addEntry = () =>
     setEntries(es => [...es, { exercise_id: '', sets: '', reps: '', weight: '' }])
+
+  // Update an existing exercise entry
   const updateEntry = (idx, e) => {
     const { name, value } = e.target
     setEntries(es => {
@@ -82,6 +92,8 @@ export default function SessionForm({ initialData, onSave, onCancel }) {
       return nxt
     })
   }
+
+  // Remove an exercise entry
   const removeEntry = idx =>
     setEntries(es => es.filter((_, i) => i !== idx))
 

@@ -12,13 +12,13 @@ import (
 
 var DB *sql.DB
 
-// InitDB carga .env y abre la conexión global
+// InitDB loads .env and opens the global connection
 func InitDB() {
-	// 1. Carga variables
+	// 1. Load variables
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error al cargar .env: %v", err)
+		log.Fatalf("Error loading .env: %v", err)
 	}
-	// 2. Construye la cadena de conexión
+	// 2. Build the connection string
 	connStr := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -27,15 +27,15 @@ func InitDB() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 	)
-	// 3. Abre conexión
+	// 3. Open connection
 	var err error
 	DB, err = sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatalf("No se pudo conectar a DB: %v", err)
+		log.Fatalf("Could not connect to DB: %v", err)
 	}
-	// 4. Verifica con Ping
+	// 4. Verify with Ping
 	if err = DB.Ping(); err != nil {
-		log.Fatalf("Ping a DB fallido: %v", err)
+		log.Fatalf("DB Ping failed: %v", err)
 	}
-	fmt.Println("✅ Conectado a PostgreSQL")
+	fmt.Println("✅ Connected to PostgreSQL")
 }

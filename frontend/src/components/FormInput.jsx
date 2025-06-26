@@ -1,7 +1,7 @@
 import React from 'react'
 
 /**
- * Input con label y error display.
+ * Input with label and error display.
  */
 export default function FormInput({
   label,
@@ -20,7 +20,7 @@ export default function FormInput({
         name={name}
         value={value}
         onChange={onChange}
-        autoComplete="off"           // desactiva sugerencias
+        autoComplete="off" // disables suggestions
       />
       {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
     </div>

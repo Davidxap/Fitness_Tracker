@@ -22,16 +22,16 @@ export default function App() {
     <div className="min-h-screen">
       <Navbar />
       <Routes>
-        {/* Registro siempre accesible */}
+        {/* Registration always accessible */}
         <Route path="/register" element={<Register />} />
 
-        {/* Login sólo si ya existe user */}
+        {/* Login only if user exists */}
         <Route
           path="/login"
           element={user ? <Navigate to="/" replace /> : <Login />}
         />
 
-        {/* Rutas protegidas */}
+        {/* Protected routes */}
         <Route
           path="/"
           element={
@@ -57,7 +57,7 @@ export default function App() {
           }
         />
 
-        {/* Cualquier otra ruta */}
+        {/* Any other route */}
         <Route
           path="*"
           element={<Navigate to={user ? '/' : '/register'} replace />}

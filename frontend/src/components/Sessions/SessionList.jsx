@@ -3,7 +3,7 @@ import React from 'react'
 import SessionItem from './SessionItem'
 
 /**
- * Lista todas las sesiónes con formato
+ * Lists all sessions with formatting
  */
 export default function SessionList({
   sessions,

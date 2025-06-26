@@ -31,8 +31,7 @@ export default function Login() {
 
     try {
       await login(form.email, form.password)
-      // navigate() al dashboard después de login
-      navigate('/')
+    // If already authenticated, go to dashboard      navigate('/')
     } catch (err) {
       console.error(err)
       setErrors({ general: 'Invalid credentials' })

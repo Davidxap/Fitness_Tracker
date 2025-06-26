@@ -12,11 +12,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetSessionExercises lista todas las asociaciones sesión↔ejercicio.
+// GetSessionExercises lists all session-exercise associations.
 func GetSessionExercises(w http.ResponseWriter, r *http.Request) {
 	rows, err := database.DB.Query(
 		`SELECT id, session_id, exercise_id, sets, reps, weight, created_at
-    FROM session_exercises`,
+	FROM session_exercises`,
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -41,25 +41,25 @@ func GetSessionExercises(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(items)
 }
 
-// GetSessionExerciseByID devuelve un registro según {id}.
+// GetSessionExerciseByID returns a record by {id}.
 func GetSessionExerciseByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)  
 		return
 	}
 
 	var se models.SessionExercise
 	err = database.DB.QueryRow(
 		`SELECT id, session_id, exercise_id, sets, reps, weight, created_at
-        FROM session_exercises WHERE id=$1`, id,
+		FROM session_exercises WHERE id=$1`, id,
 	).Scan(
 		&se.ID, &se.SessionID, &se.ExerciseID,
 		&se.Sets, &se.Reps, &se.Weight, &se.CreatedAt,
 	)
 	if err == sql.ErrNoRows {
-		http.Error(w, "Record not found", http.StatusNotFound)
+		http.Error(w, "Record not found", http.StatusNotFound)  
 		return
 	}
 	if err != nil {
@@ -71,17 +71,17 @@ func GetSessionExerciseByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(se)
 }
 
-// CreateSessionExercise inserta una nueva asociación.
+// CreateSessionExercise inserts a new association.
 func CreateSessionExercise(w http.ResponseWriter, r *http.Request) {
 	var se models.SessionExercise
 	if err := json.NewDecoder(r.Body).Decode(&se); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)  
 		return
 	}
 
 	err := database.DB.QueryRow(
 		`INSERT INTO session_exercises(session_id,exercise_id,sets,reps,weight)
-         VALUES($1,$2,$3,$4,$5) RETURNING id,created_at`,
+		VALUES($1,$2,$3,$4,$5) RETURNING id,created_at`,
 		se.SessionID, se.ExerciseID, se.Sets, se.Reps, se.Weight,
 	).Scan(&se.ID, &se.CreatedAt)
 	if err != nil {
@@ -94,25 +94,25 @@ func CreateSessionExercise(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(se)
 }
 
-// UpdateSessionExercise modifica un registro existente.
+// UpdateSessionExercise modifies an existing record.
 func UpdateSessionExercise(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)  
 		return
 	}
 
 	var se models.SessionExercise
 	if err := json.NewDecoder(r.Body).Decode(&se); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)  
 		return
 	}
 
 	res, err := database.DB.Exec(
 		`UPDATE session_exercises
-        SET session_id=$1, exercise_id=$2, sets=$3, reps=$4, weight=$5
-        WHERE id=$6`,
+		SET session_id=$1, exercise_id=$2, sets=$3, reps=$4, weight=$5
+		WHERE id=$6`,
 		se.SessionID, se.ExerciseID, se.Sets, se.Reps, se.Weight, id,
 	)
 	if err != nil {
@@ -120,19 +120,19 @@ func UpdateSessionExercise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if cnt, _ := res.RowsAffected(); cnt == 0 {
-		http.Error(w, "Record not found", http.StatusNotFound)
+		http.Error(w, "Record not found", http.StatusNotFound)  
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// DeleteSessionExercise elimina por {id}.
+// DeleteSessionExercise deletes by {id}.
 func DeleteSessionExercise(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		http.Error(w, "Invalid ID", http.StatusBadRequest)  
 		return
 	}
 
@@ -142,7 +142,7 @@ func DeleteSessionExercise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if cnt, _ := res.RowsAffected(); cnt == 0 {
-		http.Error(w, "Record not found", http.StatusNotFound)
+		http.Error(w, "Record not found", http.StatusNotFound)  
 		return
 	}
 

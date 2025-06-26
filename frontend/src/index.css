@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Puedes añadir globales aquí */
+
 body {
   @apply bg-gray-50 text-gray-800;
 }

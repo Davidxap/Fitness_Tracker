@@ -7,23 +7,23 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Genera un token JWT con userID en las claims
+// Generates a JWT token with userID in the claims
 func GenerateToken(userID int) (string, error) {
 	secret := []byte(os.Getenv("JWT_SECRET"))
-	// Definimos claims
+	// Define claims
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(), // expira en 24h
+		"exp":     time.Now().Add(24 * time.Hour).Unix(), // expires in 24h
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(secret)
 }
 
-// Verifica el token y devuelve las claims
+// Validates the token and returns the claims
 func ValidateToken(tokenString string) (*jwt.Token, error) {
 	secret := []byte(os.Getenv("JWT_SECRET"))
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Validar algoritmo
+		// Validate algorithm
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}

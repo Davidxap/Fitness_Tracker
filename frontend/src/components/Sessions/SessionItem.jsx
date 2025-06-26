@@ -2,12 +2,12 @@
 import React from 'react'
 
 /**
- * Muestra una sesión con:
+ * Displays a session with:
  * - Name
  * - Date
  * - Duration
  * - Observations
- * - Lista de ejercicios (Exercise, Sets, Reps, Weight kg)
+ * - List of exercises (Exercise, Sets, Reps, Weight kg)
  */
 export default function SessionItem({
   session,
@@ -17,7 +17,7 @@ export default function SessionItem({
 }) {
   return (
     <div className="bg-white p-4 rounded shadow mb-4">
-      {/* Sesión - encabezado */}
+      {/* Session - header */}
       <div className="flex justify-between items-start mb-3">
         <div>
           <p><span className="font-semibold">Name:</span> {session.name}</p>

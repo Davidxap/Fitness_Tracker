@@ -17,16 +17,16 @@ export function AuthProvider({ children }) {
       const parsed = JSON.parse(u)
       api.get(`/users/${parsed.id}`)
         .then(res => setUser(res.data))
-        .catch(() => localStorage.clear())
+        .catch(() => localStorage.clear()) // Clear local storage if user is not found or invalid
         .finally(() => {
           setToken(t)
           setLoading(false)
         })
     } else {
-      localStorage.clear()
+      localStorage.clear() // Clear local storage if no token or user found
       setLoading(false)
     }
-  }, [])
+  }, []) // Empty dependency array means this effect runs once on mount
 
   const login = async (email, password) => {
     const res = await api.post('/login', { email, password })
@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
-    localStorage.clear()
+    localStorage.clear() // Clear all items from local storage
     setToken(null)
     setUser(null)
   }

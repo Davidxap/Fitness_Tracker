@@ -11,30 +11,30 @@ export default function Sessions() {
   const [showForm, setShowForm] = useState(false)
   const [message, setMessage] = useState('')
 
-  // Carga ejercicios + sesiones + relaciones
+  // Load exercises + sessions + relationships
   const loadData = async () => {
     try {
-      // 1) Obtener todos los ejercicios y construir exMap
+      // 1) Get all exercises and build exMap
       const exRes = await api.get('/exercises')
       const exMap = {}
       exRes.data.forEach(e => {
         exMap[e.id] = e.name
       })
 
-      // 2) Obtener sesiones y session-exercises
+      // 2) Get sessions and session-exercises
       const [sRes, seRes] = await Promise.all([
         api.get('/sessions'),
         api.get('/session-exercises')
       ])
 
-      // 3) Filtrar solo las sesiones del user
+      // 3) Filter only user's sessions
       const own = sRes.data.filter(s => s.user_id === user.id)
 
-      // 4) Combinar cada sesión con sus ejercicios y asignar exercise_name
+      // 4) Combine each session with its exercises and assign exercise_name
       const combined = own.map(s => {
-        // obtenemos solo los relationships de esta sesión
+        // get only the relationships for this session
         const related = seRes.data.filter(se => se.session_id === s.id)
-        // mapeamos cada uno añadiendo exercise_name
+        // map each one adding exercise_name
         const exercises = related.map(se => ({
           id: se.id,
           exercise_id: se.exercise_id,
@@ -74,7 +74,7 @@ export default function Sessions() {
           user_id: user.id
         })
         sessionId = editing.id
-        // Borrar anteriores session-exercises
+        // Delete previous session-exercises
         await Promise.all(
           editing.exercises.map(e =>
             api.delete(`/session-exercises/${e.id}`)
@@ -91,7 +91,7 @@ export default function Sessions() {
         })
         sessionId = r.data.id
       }
-      // Guardar los nuevos session-exercises
+      // Save new session-exercises
       await Promise.all(
         data.exercises.map(ent =>
           api.post('/session-exercises', {
@@ -121,7 +121,7 @@ export default function Sessions() {
   const handleDelete = async id => {
     if (!window.confirm('Delete this session?')) return
     try {
-      // borrar session-exercises luego la sesión
+      // delete session-exercises then the session
       const toDel = sessions.find(s => s.id === id).exercises
       await Promise.all(toDel.map(e => api.delete(`/session-exercises/${e.id}`)))
       await api.delete(`/sessions/${id}`)

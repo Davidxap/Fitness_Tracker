@@ -6,7 +6,7 @@ export default function Dashboard() {
 
   if (!user) return <p className="p-6">Loading...</p>
 
-  // Formateamos created_at (YYYY-MM-DD)
+  // Format created_at (YYYY-MM-DD)
   const regDate = user.created_at.slice(0, 10)
 
   return (

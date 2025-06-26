@@ -8,7 +8,7 @@ export default function Register() {
   const { user, register } = useAuth()
   const navigate = useNavigate()
 
-  // Si user existe → dashboard
+  // If use exist → dashboard
   useEffect(() => {
     if (user) {
       navigate('/')
