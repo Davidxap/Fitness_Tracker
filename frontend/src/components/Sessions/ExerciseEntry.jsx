@@ -1,18 +1,17 @@
 // frontend/src/components/Sessions/ExerciseEntry.jsx
 import React from 'react'
 import FormInput from '../FormInput'
-
 /**
- * Un único bloque de selección de ejercicio + sets/reps/weight
- * @param {Array} options Lista de ejercicios {id,name}
+ * A single block for exercise selection + sets/reps/weight
+ * @param {Array} options List of exercises {id,name}
  * @param {Object} data {exercise_id, sets, reps, weight}
- * @param {Function} onChange callback cuando cambia un campo
- * @param {Function} onRemove callback para eliminar este entry
+ * @param {Function} onChange callback when a field changes
+ * @param {Function} onRemove callback to remove this entry
  */
 export default function ExerciseEntry({ options, data, onChange, onRemove }) {
   return (
     <div className="grid grid-cols-5 gap-2 items-end mb-4">
-      {/* Dropdown de ejercicios */}
+      {/* Exercise dropdown */}
       <div className="col-span-2">
         <label className="block text-sm">Exercise</label>
         <select
