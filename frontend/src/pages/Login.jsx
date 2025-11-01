@@ -7,7 +7,7 @@ export default function Login() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
 
-  // Si ya está autenticado, ir a dashboard
+  // If already authenticated, go to dashboard
   useEffect(() => {
     if (user) {
       navigate('/')
@@ -28,10 +28,10 @@ export default function Login() {
   const handleSubmit = async ev => {
     ev.preventDefault()
     if (!validate()) return
-
     try {
       await login(form.email, form.password)
-    // If already authenticated, go to dashboard      navigate('/')
+      // If already authenticated, go to dashboard
+      navigate('/')
     } catch (err) {
       console.error(err)
       setErrors({ general: 'Invalid credentials' })
